@@ -64,11 +64,10 @@ export default function WeatherWidget() {
         const message = await response.json();
         setError(message.error.message); // Set error message
         setWeather(null); // Clear previous weather data
-        throw new Error(message.error.message); // Throw an error if the response is not ok
       }
     } catch (error) {
       console.error("Error fetching weather data:", error);
-      setError("City not found. Please try again."); // Set error message
+      setError(String(error)); // Set error message
       setWeather(null); // Clear previous weather data
     } finally {
       setIsLoading(false); // Set loading state to false
