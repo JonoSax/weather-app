@@ -1,4 +1,4 @@
-import WeatherWidget from "@/components/widget";
+import WeatherWidget from "@/components/weather-widget";
 
 export default function Home() {
   return (
