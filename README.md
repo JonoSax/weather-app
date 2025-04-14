@@ -36,10 +36,17 @@ This project is a weather application that allows users to search for current we
 
 ## Usage
 
-1. Start the development server:
+1. Get keys from [OpenWeatherMap](https://openweathermap.org/api) and [Mapbox](https://www.mapbox.com/) and create a `.env` file in the root directory with the following variables:
+
+   ```
+   NEXT_PUBLIC_WEATHER_API_KEY={openweather_api_key}
+   NEXT_PUBLIC_MAPBOX_TOKEN={mapbox_api_key}
+   ```
+
+2. Start the development server:
 
    ```
    npm run dev
    ```
 
-2. Open your browser and go to `http://localhost:3000` to view the application.
+3. Open your browser and go to `http://localhost:3000` to view the application.
