@@ -6,7 +6,7 @@ This project is a weather application that allows users to search for current we
 
 - Search for weather information by city name.
 - Display current temperature, weather description, and location.
-- Interactive map using Mapbox to visualize the searched location.
+- Interactive map using Mapbox to allow you to perform more fine resolution weather searching.
 
 ## Technologies Used
 
@@ -43,11 +43,3 @@ This project is a weather application that allows users to search for current we
    ```
 
 2. Open your browser and go to `http://localhost:3000` to view the application.
-
-## Contributing
-
-Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
-
-## License
-
-This project is licensed under the MIT License.
