@@ -1,7 +1,7 @@
 "use client"; // Enables client-side rendering for this component
 
 // Import necessary hooks and types from React
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState, ChangeEvent, FormEvent, useEffect } from "react";
 
 // Import custom UI components from the UI directory
 import {
@@ -13,20 +13,37 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { setExactLocation } from "@/reducer/locationReducer";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "@/reducer/locationReducer"; // ensure this path matches your store file
 
 // Import icons from the Lucide React library
 import { CloudIcon, MapPinIcon, ThermometerIcon } from "lucide-react";
-import { fetchLocation } from "@/lib/utils";
+import { fetchLocationPosition } from "@/lib/api";
 
 // Default export of the WeatherWidgetComponent function
 export default function WeatherWidget() {
   // State hooks for managing location input, weather data, error messages, and loading state
   const [searchLocation, setSearchLocation] = useState<string>("");
-  const [exactLocation, setExactLocation] = useState<Location>();
+  const [exactLocationState, setExactLocationState] = useState<ExactLocation>();
 
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const dispatch = useDispatch();
+  const exactLocation = useSelector((state: RootState) => state.exactLocation);
+
+  // Everytime the exactLocationState is updated, update the exactLocation reducer state
+  useEffect(() => {
+    if (exactLocationState) {
+      dispatch(
+        setExactLocation({
+          latitude: exactLocationState.latitude,
+          longitude: exactLocationState.longitude,
+        })
+      );
+    }
+  }, [exactLocationState]);
 
   // Function to handle the search form submission
   const handleSearch = async (e: FormEvent<HTMLFormElement>) => {
@@ -42,7 +59,7 @@ export default function WeatherWidget() {
     setError(null); // Clear any previous error messages
 
     try {
-      const location = await fetchLocation(trimmedLocation); // Fetch the exact location using the geocoding API
+      const location = await fetchLocationPosition(trimmedLocation); // Fetch the exact location using the geocoding API
 
       if (location.error || !location.fullLocationName) {
         setError(location.error); // Set error message if location fetch fails
@@ -53,15 +70,15 @@ export default function WeatherWidget() {
 
       // Set the name in the typed space to be the full location name including country
       setSearchLocation(fullLocationName);
-      setExactLocation({ latitude, longitude } as Location);
+      setExactLocationState({ latitude, longitude } as ExactLocation);
 
+      // NOTE need to move this into the API file
       // Fetch weather data from the weather API
       const response = await fetch(
         `https://api.openweathermap.org/data/3.0/onecall/timemachine?lat=${latitude}&lon=${longitude}&dt=${time}&appid=${process.env.NEXT_PUBLIC_WEATHER_API_KEY}&units=metric`
       );
       if (response.ok) {
         const weather = await response.json();
-
         const temperature = weather.data[0].temp;
         const description = weather.data[0].weather[0].description;
         const location = "";

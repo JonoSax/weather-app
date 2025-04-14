@@ -1,5 +1,8 @@
+"use client";
 import Mapbox from "@/components/Mapbox";
 import WeatherWidget from "@/components/WeatherWidget";
+import { Provider } from "react-redux";
+import { store } from "@/reducer/locationReducer";
 
 export default function Home() {
   return (
@@ -11,12 +14,14 @@ export default function Home() {
         height: "100vh",
       }}
     >
-      <div>
-        <WeatherWidget />
-        <div style={{ width: "50vw", height: "50vh", margin: "0 auto" }}>
-          <Mapbox />
+      <Provider store={store}>
+        <div>
+          <WeatherWidget />
+          <div style={{ width: "50vw", height: "50vh", margin: "0 auto" }}>
+            <Mapbox />
+          </div>
         </div>
-      </div>
+      </Provider>
     </div>
   );
 }
