@@ -22,7 +22,8 @@ import { fetchLocation } from "@/lib/utils";
 export default function WeatherWidget() {
   // State hooks for managing location input, weather data, error messages, and loading state
   const [searchLocation, setSearchLocation] = useState<string>("");
-  const [exactLocation, setExactLocation] = useState<string>("");
+  const [exactLocation, setExactLocation] = useState<Location>();
+
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -52,6 +53,7 @@ export default function WeatherWidget() {
 
       // Set the name in the typed space to be the full location name including country
       setSearchLocation(fullLocationName);
+      setExactLocation({ latitude, longitude } as Location);
 
       // Fetch weather data from the weather API
       const response = await fetch(
@@ -142,7 +144,7 @@ export default function WeatherWidget() {
 
   // JSX return statement rendering the weather widget UI
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center">
       {/* Center the card within the screen */}
       <Card className="w-full max-w-md mx-auto text-center">
         {/* Card header with title and description */}

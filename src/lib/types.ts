@@ -1,8 +1,6 @@
 // Convert free text locations into co-ordinates
-interface LocationData {
+interface LocationData extends Location {
   fullLocationName: string | null;
-  latitude: number | null;
-  longitude: number | null;
   time: number | null;
   error: string | null;
 }
@@ -13,4 +11,9 @@ interface WeatherData {
   description: string;
   location: string;
   unit: string;
+}
+
+interface Location {
+  latitude: number | null;
+  longitude: number | null;
 }
