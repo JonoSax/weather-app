@@ -16,19 +16,13 @@ import { Button } from "@/components/ui/button";
 
 // Import icons from the Lucide React library
 import { CloudIcon, MapPinIcon, ThermometerIcon } from "lucide-react";
-
-// Define a TypeScript interface for weather data
-interface WeatherData {
-  temperature: number;
-  description: string;
-  location: string;
-  unit: string;
-}
+import { fetchLocation } from "@/lib/utils";
 
 // Default export of the WeatherWidgetComponent function
 export default function WeatherWidget() {
   // State hooks for managing location input, weather data, error messages, and loading state
-  const [location, setLocation] = useState<string>("");
+  const [searchLocation, setSearchLocation] = useState<string>("");
+  const [exactLocation, setExactLocation] = useState<string>("");
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -36,7 +30,7 @@ export default function WeatherWidget() {
   // Function to handle the search form submission
   const handleSearch = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const trimmedLocation = location.trim();
+    const trimmedLocation = searchLocation.trim();
     if (trimmedLocation === "") {
       setError("Please enter a valid location."); // Set error message if location input is empty
       setWeather(null); // Clear previous weather data
@@ -47,16 +41,33 @@ export default function WeatherWidget() {
     setError(null); // Clear any previous error messages
 
     try {
+      const location = await fetchLocation(trimmedLocation); // Fetch the exact location using the geocoding API
+
+      if (location.error || !location.fullLocationName) {
+        setError(location.error); // Set error message if location fetch fails
+        setWeather(null); // Clear previous weather data
+        return;
+      }
+      const { fullLocationName, latitude, longitude, time } = location; // Destructure latitude, longitude, and time from the location object
+
+      // Set the name in the typed space to be the full location name including country
+      setSearchLocation(fullLocationName);
+
       // Fetch weather data from the weather API
       const response = await fetch(
-        `https://api.weatherapi.com/v1/current.json?key=${process.env.NEXT_PUBLIC_WEATHER_API_KEY}&q=${trimmedLocation}`
+        `https://api.openweathermap.org/data/3.0/onecall/timemachine?lat=${latitude}&lon=${longitude}&dt=${time}&appid=${process.env.NEXT_PUBLIC_WEATHER_API_KEY}&units=metric`
       );
       if (response.ok) {
-        const data = await response.json();
+        const weather = await response.json();
+
+        const temperature = weather.data[0].temp;
+        const description = weather.data[0].weather[0].description;
+        const location = "";
+
         const weatherData: WeatherData = {
-          temperature: data.current.temp_c, // Get temperature in Celsius
-          description: data.current.condition.text, // Get weather description
-          location: data.location.name, // Get location name
+          temperature,
+          description,
+          location,
           unit: "C", // Unit for temperature
         };
         setWeather(weatherData); // Set the fetched weather data
@@ -64,6 +75,7 @@ export default function WeatherWidget() {
         const message = await response.json();
         setError(message.error.message); // Set error message
         setWeather(null); // Clear previous weather data
+        // console.error(message.error.message);
       }
     } catch (error) {
       console.error("Error fetching weather data:", error);
@@ -147,10 +159,10 @@ export default function WeatherWidget() {
             <Input
               type="text"
               placeholder="Enter a city name"
-              value={location}
+              value={searchLocation}
               onChange={
                 (e: ChangeEvent<HTMLInputElement>) =>
-                  setLocation(e.target.value) // Update location state on input change
+                  setSearchLocation(e.target.value) // Update location state on input change
               }
             />
             <Button type="submit" disabled={isLoading}>
