@@ -19,13 +19,14 @@ import { RootState } from "@/reducer/locationReducer"; // ensure this path match
 
 // Import icons from the Lucide React library
 import { CloudIcon, MapPinIcon, ThermometerIcon } from "lucide-react";
-import { fetchLocationPosition } from "@/lib/api";
+import { fetchLocationPosition, fetchWeatherData } from "@/lib/api";
 
 // Default export of the WeatherWidgetComponent function
 export default function WeatherWidget() {
   // State hooks for managing location input, weather data, error messages, and loading state
+
+  // NOTE we should be able to read this from localStorage
   const [searchLocation, setSearchLocation] = useState<string>("");
-  const [exactLocationState, setExactLocationState] = useState<ExactLocation>();
 
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -33,76 +34,56 @@ export default function WeatherWidget() {
   const dispatch = useDispatch();
   const exactLocation = useSelector((state: RootState) => state.exactLocation);
 
-  // Everytime the exactLocationState is updated, update the exactLocation reducer state
+  // Everytime the placename redux state changes, update the weather widget
   useEffect(() => {
-    if (exactLocationState) {
-      dispatch(
-        setExactLocation({
-          latitude: exactLocationState.latitude,
-          longitude: exactLocationState.longitude,
-        })
-      );
+    if (exactLocation.placename) {
+      setSearchLocation(exactLocation.placename);
+      updateWeatherForecast(exactLocation.latitude, exactLocation.longitude);
     }
-  }, [exactLocationState]);
+  }, [exactLocation]);
+
+  useEffect(() => {
+    console.log(searchLocation);
+  }, [searchLocation]);
+
+  // When the user searches for a placename, get the exact location data
+  const handleSearch = async (location: string) => {
+    const locationData = await fetchLocationPosition(location);
+    if (locationData.error || !locationData.placename) {
+      setError(locationData.error);
+      setWeather(null);
+    }
+    dispatch(
+      setExactLocation({
+        latitude: locationData.latitude,
+        longitude: locationData.longitude,
+        placename: locationData.placename,
+      })
+    );
+  };
 
   // Function to handle the search form submission
-  const handleSearch = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const trimmedLocation = searchLocation.trim();
-    if (trimmedLocation === "") {
-      setError("Please enter a valid location."); // Set error message if location input is empty
-      setWeather(null); // Clear previous weather data
+  const updateWeatherForecast = async (
+    latitude: number | null,
+    longitude: number | null
+  ) => {
+    if (!latitude || !longitude) {
       return;
     }
 
     setIsLoading(true); // Set loading state to true
     setError(null); // Clear any previous error messages
 
-    try {
-      const location = await fetchLocationPosition(trimmedLocation); // Fetch the exact location using the geocoding API
+    const weatherResult = await fetchWeatherData(latitude, longitude);
 
-      if (location.error || !location.fullLocationName) {
-        setError(location.error); // Set error message if location fetch fails
-        setWeather(null); // Clear previous weather data
-        return;
-      }
-      const { fullLocationName, latitude, longitude, time } = location; // Destructure latitude, longitude, and time from the location object
-
-      // Set the name in the typed space to be the full location name including country
-      setSearchLocation(fullLocationName);
-      setExactLocationState({ latitude, longitude } as ExactLocation);
-
-      // NOTE need to move this into the API file
-      // Fetch weather data from the weather API
-      const response = await fetch(
-        `https://api.openweathermap.org/data/3.0/onecall/timemachine?lat=${latitude}&lon=${longitude}&dt=${time}&appid=${process.env.NEXT_PUBLIC_WEATHER_API_KEY}&units=metric`
-      );
-      if (response.ok) {
-        const weather = await response.json();
-        const temperature = weather.data[0].temp;
-        const description = weather.data[0].weather[0].description;
-        const location = "";
-
-        const weatherData: WeatherData = {
-          temperature,
-          description,
-          location,
-          unit: "C", // Unit for temperature
-        };
-        setWeather(weatherData); // Set the fetched weather data
-      } else {
-        const message = await response.json();
-        setError(message.error.message); // Set error message
-        setWeather(null); // Clear previous weather data
-        // console.error(message.error.message);
-      }
-    } catch (error) {
+    if (typeof weatherResult === "string") {
       console.error("Error fetching weather data:", error);
-      setError(String(error)); // Set error message
+      setError(weatherResult); // Set error message
       setWeather(null); // Clear previous weather data
-    } finally {
-      setIsLoading(false); // Set loading state to false
+    } else {
+      setWeather(weatherResult); // Set the fetched weather data
     }
+    setIsLoading(false);
   };
 
   // Function to get a temperature message based on the temperature value and unit
@@ -156,7 +137,9 @@ export default function WeatherWidget() {
     const currentHour = new Date().getHours();
     const isNight = currentHour >= 18 || currentHour < 6; // Determine if it's night time
 
-    return ` ${location} ${isNight ? "at Night" : "During the Day"}`;
+    return ` ${location} ${
+      isNight ? "Currently Night-time" : "Currently Day-time"
+    }`;
   }
 
   // JSX return statement rendering the weather widget UI
@@ -174,19 +157,25 @@ export default function WeatherWidget() {
         {/* Card content including the search form and weather display */}
         <CardContent>
           {/* Form to input and submit the location */}
-          <form onSubmit={handleSearch} className="flex items-center gap-2">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSearch(searchLocation);
+            }}
+            className="flex items-center gap-2"
+          >
             <Input
               type="text"
               placeholder="Enter a city name"
               value={searchLocation}
-              onChange={
+              onChange={(e) => setSearchLocation(e.target.value)}
+              onSubmit={
                 (e: ChangeEvent<HTMLInputElement>) =>
                   setSearchLocation(e.target.value) // Update location state on input change
               }
             />
             <Button type="submit" disabled={isLoading}>
               {isLoading ? "Loading..." : "Search"}{" "}
-              {/* Show "Loading..." text while fetching data */}
             </Button>
           </form>
           {/* Display error message if any */}

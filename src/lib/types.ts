@@ -1,6 +1,5 @@
 // Convert free text locations into co-ordinates
 interface LocationData extends ExactLocation {
-  fullLocationName: string | null;
   time: number | null;
   error: string | null;
 }
@@ -11,9 +10,14 @@ interface WeatherData {
   description: string;
   location: string;
   unit: string;
+  humidity: number;
+  windSpeed: number;
+  feelsLike: number;
+  time: number;
 }
 
 interface ExactLocation {
   latitude: number | null;
   longitude: number | null;
+  placename: string | null;
 }
