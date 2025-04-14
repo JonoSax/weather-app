@@ -15,7 +15,20 @@ export const fetchLocation = async (
   try {
     if (response.ok) {
       const data = await response.json();
+
       const locationData = data[0]; // Assuming the first result is the most relevant
+
+      if (locationData === undefined) {
+        const error = `${location} cannot be found`;
+        return {
+          fullLocationName: null,
+          latitude: null,
+          longitude: null,
+          time: null,
+          error: String(error),
+        }; // Return error message
+      }
+
       const fullLocationName = `${locationData.name}, ${locationData.country}`;
       const latitude = locationData.lat; // Get latitude
       const longitude = locationData.lon; // Get longitude
