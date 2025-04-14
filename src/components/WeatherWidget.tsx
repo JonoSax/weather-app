@@ -128,7 +128,7 @@ export default function WeatherWidget() {
       case "fog":
         return "Be careful, there's fog outside.";
       default:
-        return description; // Default to returning the description as-is
+        return description.replace(/\b\w/g, (l) => l.toUpperCase()); // Default to returning the description as-is
     }
   }
 
