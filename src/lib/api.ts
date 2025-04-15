@@ -5,7 +5,7 @@ export const fetchLocationPosition = async (
   location: string
 ): Promise<LocationData> => {
   const response = await fetch(
-    `http://api.openweathermap.org/geo/1.0/direct?q=${location}&limit=5&appid=${process.env.NEXT_PUBLIC_WEATHER_API_KEY}`
+    `https://api.openweathermap.org/geo/1.0/direct?q=${location}&limit=5&appid=${process.env.NEXT_PUBLIC_WEATHER_API_KEY}`
   );
   try {
     if (response.ok) {
@@ -57,7 +57,7 @@ export const fetchLocationName = async (
   longitude: number
 ): Promise<LocationData> => {
   const response = await fetch(
-    `http://api.openweathermap.org/geo/1.0/reverse?lat=${latitude}&lon=${longitude}&limit=1&appid=${process.env.NEXT_PUBLIC_WEATHER_API_KEY}`
+    `https://api.openweathermap.org/geo/1.0/reverse?lat=${latitude}&lon=${longitude}&limit=1&appid=${process.env.NEXT_PUBLIC_WEATHER_API_KEY}`
   );
 
   try {
