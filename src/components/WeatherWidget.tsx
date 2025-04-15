@@ -24,6 +24,7 @@ import {
   Droplet,
   MapPinIcon,
   Shirt,
+  SunMoon,
   ThermometerIcon,
   Wind,
 } from "lucide-react";
@@ -49,10 +50,6 @@ export default function WeatherWidget() {
       updateWeatherForecast(exactLocation.latitude, exactLocation.longitude);
     }
   }, [exactLocation]);
-
-  useEffect(() => {
-    console.log(searchLocation);
-  }, [searchLocation]);
 
   // When the user searches for a placename, get the exact location data
   const handleSearch = async (location: string) => {
@@ -198,40 +195,40 @@ export default function WeatherWidget() {
           {/* Display weather data if available */}
           {weather && (
             <div className="mt-4 grid gap-2 h-1/2 mx-auto">
-              {/* Display temperature message with icon */}
+              <WeatherIcon
+                text={getTemperatureMessage(weather.feelsLike, weather.unit)}
+                Icon={<Shirt className=" h-6 " />}
+                halfWidth={false}
+              />
               <div className="flex items-center gap-2">
-                <Shirt className=" h-6" />
-                {getTemperatureMessage(weather.feelsLike, weather.unit)}
+                <WeatherIcon
+                  text={`Actual temperature is ${weather.temperature}°C`}
+                  Icon={<ThermometerIcon className=" h-6 " />}
+                />
+                <WeatherIcon
+                  text={getLocationMessage(weather.locationLight)}
+                  Icon={<SunMoon className=" h-6 " />}
+                />
+              </div>
+              <div className="flex items-center gap-2 ">
+                <WeatherIcon
+                  text={getWeatherMessage(weather.description)}
+                  Icon={<CloudIcon className=" h-6 " />}
+                />
+                <WeatherIcon
+                  text={`${weather.humidity}% humidity`}
+                  Icon={<Droplet className=" h-6 " />}
+                />
               </div>
               <div className="flex items-center gap-2">
-                <div className="flex items-center w-1/2 gap-2">
-                  <ThermometerIcon className=" h-6" />
-                  {`Actual temperature is ${weather.temperature}`}
-                </div>
-                <div className="flex items-center gap-2">
-                  <MapPinIcon className=" h-6 " />
-                  <div>{getLocationMessage(weather.locationLight)}</div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center w-1/2  gap-2">
-                  <CloudIcon className=" h-6 " />
-                  <div>{getWeatherMessage(weather.description)}</div>
-                </div>
-                <div className="flex items-center w-1/2 gap-2">
-                  <Droplet className=" h-6 " />
-                  <div>{`${weather.humidity}% humidity`}</div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center w-1/2 gap-2">
-                  <Wind className=" h-6 " />
-                  <div>{`${weather.windSpeed}km/hr wind`}</div>
-                </div>
-                <div className="flex items-center w-1/2 gap-2">
-                  <Compass className=" h-6 " />
-                  <div>{`${weather.windDirection} direction`}</div>
-                </div>
+                <WeatherIcon
+                  text={`${weather.windSpeed}km/hr wind`}
+                  Icon={<Wind className=" h-6 " />}
+                />
+                <WeatherIcon
+                  text={`${weather.windDirection} direction`}
+                  Icon={<Compass className=" h-6 " />}
+                />
               </div>
             </div>
           )}
@@ -240,3 +237,30 @@ export default function WeatherWidget() {
     </div>
   );
 }
+
+// Create a componenet for the weather icons
+const WeatherIcon = ({
+  text,
+  tooltip,
+  Icon,
+  halfWidth = true,
+}: {
+  text: String;
+  Icon: JSX.Element;
+  tooltip?: String | null;
+  halfWidth?: Boolean;
+}) => {
+  return (
+    <div
+      className={`flex items-center gap-2 relative group ${
+        halfWidth && "w-1/2"
+      }`}
+    >
+      {Icon}
+      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1">
+        {tooltip}
+      </div>
+      {text}
+    </div>
+  );
+};
