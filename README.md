@@ -1,6 +1,6 @@
 # Weather App
 
-This project is a weather application that allows users to search for current weather conditions based on city names. It utilizes the OpenWeatherMap API to fetch weather data and Mapbox for displaying geographical information.
+This project is a weather application that allows users to search for current weather conditions by either searching for a location place or scrolling through the map. It utilizes the OpenWeatherMap API to fetch weather data and Mapbox for displaying geographical information.
 
 ## Features
 
