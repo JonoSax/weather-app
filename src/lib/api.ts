@@ -113,17 +113,26 @@ export const fetchWeatherData = async (
   try {
     const time = Math.floor(Date.now() / 1000);
     const response = await fetch(
-      `https://api.openweathermap.org/data/3.0/onecall/timemachine?lat=${latitude}&lon=${longitude}&dt=${time}&appid=${process.env.NEXT_PUBLIC_WEATHER_API_KEY}&units=metric`
+      `https://api.openweathermap.org/data/3.0/onecall?lat=${latitude}&lon=${longitude}&appid=${process.env.NEXT_PUBLIC_WEATHER_API_KEY}&units=metric&exclude=minutely,hourly,alerts`
     );
     if (response.ok) {
       const weather = await response.json();
-      const temperature = Math.round(weather.data[0].temp * 10) / 10; // Round to 1 decimal place
-      const description = weather.data[0].weather[0].description;
-      const location = "";
-      const humidity = Math.round(weather.data[0].humidity);
-      const windSpeed = Math.round(weather.data[0].wind_speed);
-      const feelsLike = Math.round(weather.data[0].feels_like * 10) / 10;
-      const windDirection = degToCompass(weather.data[0].wind_deg);
+      const currentWeather = weather.current;
+      const temperature = Math.round(currentWeather.temp * 10) / 10; // Round to 1 decimal place
+      const description = currentWeather.weather[0].description;
+      const location = {
+        latitude: weather.lat,
+        longitude: weather.lon,
+        placename: null,
+      };
+      const locationLight = {
+        sunrise: currentWeather.sunrise,
+        sunset: currentWeather.sunset,
+      };
+      const humidity = Math.round(currentWeather.humidity);
+      const windSpeed = Math.round(currentWeather.wind_speed);
+      const feelsLike = Math.round(currentWeather.feels_like * 10) / 10;
+      const windDirection = degToCompass(currentWeather.wind_deg);
 
       const weatherData: WeatherData = {
         temperature,
@@ -134,6 +143,7 @@ export const fetchWeatherData = async (
         humidity,
         windSpeed,
         windDirection,
+        locationLight,
         time: time,
       };
       return weatherData;

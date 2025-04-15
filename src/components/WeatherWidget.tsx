@@ -141,13 +141,17 @@ export default function WeatherWidget() {
   }
 
   // Function to get a location message based on the current time
-  function getLocationMessage(location: string): string {
-    const currentHour = new Date().getHours();
-    const isNight = currentHour >= 18 || currentHour < 6; // Determine if it's night time
+  function getLocationMessage(locationLight: LocationLight): string {
+    const { sunrise, sunset } = locationLight;
+    const time = Math.floor(Date.now() / 1000);
+    let isNight = null;
+    if (time < sunset && time > sunrise) {
+      isNight = false;
+    } else {
+      isNight = true;
+    }
 
-    return ` ${location} ${
-      isNight ? "Currently Night-time" : "Currently Day-time"
-    }`;
+    return `${isNight ? "Currently Night-time" : "Currently Day-time"}`;
   }
 
   // JSX return statement rendering the weather widget UI
@@ -206,7 +210,7 @@ export default function WeatherWidget() {
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPinIcon className=" h-6 " />
-                  <div>{getLocationMessage(weather.location)}</div>
+                  <div>{getLocationMessage(weather.locationLight)}</div>
                 </div>
               </div>
               <div className="flex items-center gap-2">

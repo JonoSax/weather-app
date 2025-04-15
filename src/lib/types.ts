@@ -9,11 +9,12 @@ interface WeatherData {
   temperature: number;
   feelsLike: number;
   description: string;
-  location: string;
+  location: ExactLocation;
   unit: string;
   humidity: number;
   windSpeed: number;
   windDirection: string;
+  locationLight: LocationLight;
   time: number;
 }
 
@@ -21,4 +22,9 @@ interface ExactLocation {
   latitude: number | null;
   longitude: number | null;
   placename: string | null;
+}
+
+interface LocationLight {
+  sunrise: number;
+  sunset: number;
 }
