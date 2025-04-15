@@ -18,7 +18,15 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/reducer/locationReducer"; // ensure this path matches your store file
 
 // Import icons from the Lucide React library
-import { CloudIcon, MapPinIcon, ThermometerIcon } from "lucide-react";
+import {
+  CloudIcon,
+  Compass,
+  Droplet,
+  MapPinIcon,
+  Shirt,
+  ThermometerIcon,
+  Wind,
+} from "lucide-react";
 import { fetchLocationPosition, fetchWeatherData } from "@/lib/api";
 
 // Default export of the WeatherWidgetComponent function
@@ -144,9 +152,12 @@ export default function WeatherWidget() {
 
   // JSX return statement rendering the weather widget UI
   return (
-    <div className="flex justify-center items-center">
+    <div
+      className="flex justify-center items-center mx-auto"
+      style={{ width: "1000px" }}
+    >
       {/* Center the card within the screen */}
-      <Card className="w-full max-w-md mx-auto text-center">
+      <Card className="w-full max-w-xl text-center">
         {/* Card header with title and description */}
         <CardHeader>
           <CardTitle>Weather Widget</CardTitle>
@@ -182,23 +193,41 @@ export default function WeatherWidget() {
           {error && <div className="mt-4 text-red-500">{error}</div>}
           {/* Display weather data if available */}
           {weather && (
-            <div className="mt-4 grid gap-2">
+            <div className="mt-4 grid gap-2 h-1/2 mx-auto">
               {/* Display temperature message with icon */}
               <div className="flex items-center gap-2">
+                <Shirt className=" h-6" />
+                {getTemperatureMessage(weather.feelsLike, weather.unit)}
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center w-1/2 gap-2">
+                  <ThermometerIcon className=" h-6" />
+                  {`Actual temperature is ${weather.temperature}`}
+                </div>
                 <div className="flex items-center gap-2">
-                  <ThermometerIcon className="w-6 h-6" />
-                  {getTemperatureMessage(weather.temperature, weather.unit)}
+                  <MapPinIcon className=" h-6 " />
+                  <div>{getLocationMessage(weather.location)}</div>
                 </div>
               </div>
-              {/* Display weather description message with icon */}
               <div className="flex items-center gap-2">
-                <CloudIcon className="w-6 h-6 " />
-                <div>{getWeatherMessage(weather.description)}</div>
+                <div className="flex items-center w-1/2  gap-2">
+                  <CloudIcon className=" h-6 " />
+                  <div>{getWeatherMessage(weather.description)}</div>
+                </div>
+                <div className="flex items-center w-1/2 gap-2">
+                  <Droplet className=" h-6 " />
+                  <div>{`${weather.humidity}% humidity`}</div>
+                </div>
               </div>
-              {/* Display location message with icon */}
               <div className="flex items-center gap-2">
-                <MapPinIcon className="w-6 h-6 " />
-                <div>{getLocationMessage(weather.location)}</div>
+                <div className="flex items-center w-1/2 gap-2">
+                  <Wind className=" h-6 " />
+                  <div>{`${weather.windSpeed}km/hr wind`}</div>
+                </div>
+                <div className="flex items-center w-1/2 gap-2">
+                  <Compass className=" h-6 " />
+                  <div>{`${weather.windDirection} direction`}</div>
+                </div>
               </div>
             </div>
           )}

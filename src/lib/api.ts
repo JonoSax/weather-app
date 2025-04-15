@@ -1,3 +1,5 @@
+import { degToCompass } from "./utils";
+
 // Convert free text locations into co-ordinates
 export const fetchLocationPosition = async (
   location: string
@@ -121,15 +123,17 @@ export const fetchWeatherData = async (
       const humidity = Math.round(weather.data[0].humidity);
       const windSpeed = Math.round(weather.data[0].wind_speed);
       const feelsLike = Math.round(weather.data[0].feels_like * 10) / 10;
+      const windDirection = degToCompass(weather.data[0].wind_deg);
 
       const weatherData: WeatherData = {
         temperature,
+        feelsLike,
         description,
         location,
         unit: "C", // Unit for temperature
         humidity,
         windSpeed,
-        feelsLike,
+        windDirection,
         time: time,
       };
       return weatherData;

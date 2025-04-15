@@ -17,9 +17,7 @@ export default function Home() {
       <Provider store={store}>
         <div>
           <WeatherWidget />
-          <div style={{ width: "50vw", height: "50vh", margin: "0 auto" }}>
-            <Mapbox />
-          </div>
+          <Mapbox />
         </div>
       </Provider>
     </div>

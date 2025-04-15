@@ -7,12 +7,13 @@ interface LocationData extends ExactLocation {
 // Define a TypeScript interface for weather data
 interface WeatherData {
   temperature: number;
+  feelsLike: number;
   description: string;
   location: string;
   unit: string;
   humidity: number;
   windSpeed: number;
-  feelsLike: number;
+  windDirection: string;
   time: number;
 }
 

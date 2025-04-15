@@ -86,10 +86,15 @@ const Mapbox: React.FC = () => {
 
   return (
     <div
+      style={{
+        height: "50vh",
+        width: "100%",
+        margin: "0 auto",
+        display: "flex",
+      }}
       id="map-container"
-      style={{ height: "100%" }}
       ref={mapContainerRef}
-      className="map-container"
+      className="map-container max-w-xl"
     />
   );
 };
