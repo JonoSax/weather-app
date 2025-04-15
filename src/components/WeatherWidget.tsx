@@ -246,7 +246,7 @@ const WeatherIcon = ({
   halfWidth = true,
 }: {
   text: String;
-  Icon: JSX.Element;
+  Icon: any;
   tooltip?: String | null;
   halfWidth?: Boolean;
 }) => {
