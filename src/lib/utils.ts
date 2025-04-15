@@ -5,8 +5,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function degToCompass(num) {
-  var val = Math.floor(num / 45 + 0.5);
+export function degToCompass(degrees: number): string {
+  var val = Math.floor(degrees / 45 + 0.5);
   var arr = [
     "Northerly",
     "North Easterly",
