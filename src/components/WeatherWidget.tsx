@@ -163,7 +163,7 @@ export default function WeatherWidget() {
         <CardHeader>
           <CardTitle>Weather Widget</CardTitle>
           <CardDescription>
-            Search for the current weather conditions in your city.
+            Search and scroll for the current weather conditions in your city.
           </CardDescription>
         </CardHeader>
         {/* Card content including the search form and weather display */}
